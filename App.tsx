@@ -14,29 +14,42 @@ interface Particle {
 export default function App() {
   const [entropy, setEntropy] = useState(50); // 0 = Rigid (System 1), 100 = Fluid (System 2)
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const particles = useRef<Particle[]>([]);
   const requestRef = useRef<number>(0);
 
-  // Initialize particles
+  // Resize canvas to match container
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const count = 150;
-    const newParticles: Particle[] = [];
-    const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#10b981'];
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
-    for (let i = 0; i < count; i++) {
-      newParticles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2,
-        size: Math.random() * 3 + 1,
-        color: colors[Math.floor(Math.random() * colors.length)]
-      });
-    }
-    particles.current = newParticles;
+    const resizeCanvas = () => {
+      const rect = container.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      
+      // Reinitialize particles if canvas size changed
+      const count = 150;
+      const newParticles: Particle[] = [];
+      const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#10b981'];
+
+      for (let i = 0; i < count; i++) {
+        newParticles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+          size: Math.random() * 3 + 1,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+      particles.current = newParticles;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    return () => window.removeEventListener('resize', resizeCanvas);
   }, []);
 
   // Animation Loop
@@ -123,7 +136,7 @@ export default function App() {
   }, [entropy]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans flex flex-col md:flex-row overflow-hidden">
+    <div className="h-screen bg-slate-950 text-slate-200 font-sans flex flex-col md:flex-row overflow-hidden">
       
       {/* Control Panel (System 1 Logic) */}
       <div className="w-full md:w-80 bg-slate-900 border-r border-slate-800 p-6 flex flex-col justify-between z-10 shadow-2xl">
@@ -181,11 +194,9 @@ export default function App() {
       </div>
 
       {/* Canvas Area (The Mind) */}
-      <div className="flex-1 relative bg-slate-950 cursor-crosshair">
+      <div ref={containerRef} className="flex-1 relative bg-slate-950 cursor-crosshair overflow-hidden">
         <canvas
           ref={canvasRef}
-          width={800}
-          height={800}
           className="w-full h-full block"
         />
         
