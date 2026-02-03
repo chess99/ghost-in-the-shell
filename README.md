@@ -2,7 +2,7 @@
 
 > 一次与 AI 的奇妙对话，以及它留下的作品。
 
-**在线演示**: [https://blog.cearl.cc/ghost-in-the-shell/](https://blog.cearl.cc/ghost-in-the-shell/)
+**在线演示**: [https://cearl.cc/ghost-in-the-shell/](https://cearl.cc/ghost-in-the-shell/)
 
 ---
 
